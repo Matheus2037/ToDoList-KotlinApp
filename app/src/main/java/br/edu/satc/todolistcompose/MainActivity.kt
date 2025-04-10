@@ -11,8 +11,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.room.Room
+import br.edu.satc.todolistcompose.ui.ViewModel.TaskViewModel
+import br.edu.satc.todolistcompose.ui.ViewModel.TaskViewModelFactory
 import br.edu.satc.todolistcompose.ui.screens.HomeScreen
 import br.edu.satc.todolistcompose.ui.theme.ToDoListComposeTheme
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -33,14 +36,21 @@ class MainActivity : ComponentActivity() {
             taskDao.insertAll(task1, task2)
         }
 
+
+
         setContent {
+
+            val viewModel: TaskViewModel = viewModel(
+                factory = TaskViewModelFactory(taskDao)
+            )
+
             ToDoListComposeTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    HomeScreen()
+                    HomeScreen(taskViewModel = viewModel)
                 }
             }
         }

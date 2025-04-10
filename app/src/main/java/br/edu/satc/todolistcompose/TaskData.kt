@@ -28,7 +28,7 @@ interface TaskDao {
     fun loadAllByIds(taskIds: IntArray): List<TaskData>
 
     @Query("SELECT * FROM task WHERE task_title LIKE :first")
-    fun findByTitle(first: String, last: String): TaskData
+    fun findByTitle(first: String): TaskData
 
     @Update
     fun updateAll(vararg tasks: TaskData)
@@ -41,7 +41,7 @@ interface TaskDao {
 }
 
 
-@Database(entities = arrayOf(TaskData::class), version = 1)
+@Database(entities = arrayOf(TaskData::class), version = 1, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun taskDao(): TaskDao
 }
