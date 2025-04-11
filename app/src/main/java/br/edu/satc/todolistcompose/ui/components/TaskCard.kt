@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ElevatedCard
@@ -24,32 +23,30 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import br.edu.satc.todolistcompose.TaskData
 import br.edu.satc.todolistcompose.ui.theme.ToDoListComposeTheme
 
 @Composable
 fun TaskCard(
-    title: String = "Task title",
-    description: String = "Task description",
-    complete: Boolean = false
+    task: TaskData,
+    onTaskCompleteChange: (TaskData) -> Unit // Nova função lambda
 ) {
-    val taskTitle by remember {
-        mutableStateOf(title)
-    }
-    val taskDescription by remember {
-        mutableStateOf(description)
-    }
-    var taskComplete by remember {
-        mutableStateOf(complete)
-    }
+
+    var taskComplete by remember { mutableStateOf(task.complete) }
 
     ElevatedCard(
         elevation = CardDefaults.cardElevation(
             defaultElevation = 6.dp
-        ), modifier = Modifier.padding(top = 8.dp).fillMaxWidth().height(100.dp)
+        ), modifier = Modifier
+            .padding(top = 8.dp)
+            .fillMaxWidth()
+            .height(100.dp)
 
     ) {
         Column(
-            modifier = Modifier.padding(8.dp).fillMaxWidth()
+            modifier = Modifier
+                .padding(8.dp)
+                .fillMaxWidth()
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -57,24 +54,30 @@ fun TaskCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = taskTitle,
+                    text = task.title,
                     style = TextStyle(
                         fontWeight = FontWeight.Bold,
                         fontSize = 18.sp,
                         fontFamily = FontFamily.Serif
                     )
                 )
-                Checkbox(checked = taskComplete, onCheckedChange = { taskComplete = it })
+                Checkbox(checked = taskComplete,
+                    onCheckedChange = { isChecked ->
+                        taskComplete = isChecked
+                    onTaskCompleteChange(task.copy(complete = isChecked))
+                    }
+                )
             }
-            Text(text = taskDescription, fontSize = 12.sp)
+            Text(text = task.description, fontSize = 12.sp)
         }
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun TaskCardPreview() {
-    ToDoListComposeTheme {
-        TaskCard()
-    }
-}
+
+//@Preview(showBackground = true)
+//@Composable
+//fun TaskCardPreview() {
+//    ToDoListComposeTheme {
+//        TaskCard()
+//    }
+//}

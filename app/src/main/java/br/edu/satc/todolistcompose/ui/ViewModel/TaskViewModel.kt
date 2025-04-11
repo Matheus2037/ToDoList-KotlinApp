@@ -17,30 +17,34 @@ class TaskViewModel(private val taskDao: TaskDao) : ViewModel() {
         loadTasks()
     }
 
-    fun loadTasks() {
+    fun loadTasks(filterByComplete: Boolean = false) {
         viewModelScope.launch {
-            _tasks.value = taskDao.getAll()
+            if(filterByComplete == false) {
+                _tasks.value = taskDao.getAll()
+            }else{
+                _tasks.value = taskDao.findByComplete()
+            }
         }
     }
 
     fun addTask(title: String, description: String) {
         viewModelScope.launch {
             taskDao.insertAll(TaskData(0, title, description, false))
-            loadTasks()
+            loadTasks(filterByComplete = false)
         }
     }
 
     fun updateTask(task: TaskData) {
         viewModelScope.launch {
             taskDao.updateAll(task)
-            loadTasks()
+            loadTasks(filterByComplete = false)
         }
     }
 
     fun deleteTask(task: TaskData) {
         viewModelScope.launch {
             taskDao.delete(task)
-            loadTasks()
+            loadTasks(filterByComplete = false)
         }
     }
 }

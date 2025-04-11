@@ -30,6 +30,9 @@ interface TaskDao {
     @Query("SELECT * FROM task WHERE task_title LIKE :first")
     fun findByTitle(first: String): TaskData
 
+    @Query("SELECT * FROM task WHERE task_description = true")
+    fun findByComplete(): List<TaskData>
+
     @Update
     fun updateAll(vararg tasks: TaskData)
 

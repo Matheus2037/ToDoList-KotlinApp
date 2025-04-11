@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -85,7 +87,7 @@ fun HomeScreen(taskViewModel: TaskViewModel) {
                      * Este é o botão de Settings que aparece no canto direito da TopBar
                      * Podemos usar ele para acessar alguma configuração do App.
                      * * */
-                    IconButton(onClick = { /* do something */ }) {
+                    IconButton(onClick = { taskViewModel.loadTasks(filterByComplete = true) }) {
                         Icon(
                             Icons.Rounded.Settings,
                             contentDescription = ""
@@ -152,6 +154,17 @@ fun HomeContent(innerPadding: PaddingValues, tasks: List<TaskData>) {
     ) {
         for (task in tasks) {
             TaskCard(task.title, task.description, task.complete)
+        }
+    }
+
+    LazyColumn {
+        items(tasks) { task ->
+            TaskCard(
+                task = task,
+                onTaskCompleteChange = { updatedTask ->
+                    taskViewModel.updateTask(updatedTask)
+                }
+            )
         }
     }
 }
