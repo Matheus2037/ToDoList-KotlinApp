@@ -30,7 +30,7 @@ interface TaskDao {
     @Query("SELECT * FROM task WHERE task_title LIKE :first")
     fun findByTitle(first: String): TaskData
 
-    @Query("SELECT * FROM task WHERE task_description = true")
+    @Query("SELECT * FROM task WHERE task_complete = true")
     fun findByComplete(): List<TaskData>
 
     @Update
@@ -41,7 +41,11 @@ interface TaskDao {
 
     @Delete
     fun delete(task: TaskData)
+
+    @Query("DELETE FROM task")
+    fun deleteAll()
 }
+
 
 
 @Database(entities = arrayOf(TaskData::class), version = 1, exportSchema = false)

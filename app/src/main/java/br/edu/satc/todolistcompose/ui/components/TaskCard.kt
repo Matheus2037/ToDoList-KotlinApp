@@ -1,5 +1,6 @@
 package br.edu.satc.todolistcompose.ui.components
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -65,6 +66,8 @@ fun TaskCard(
                     onCheckedChange = { isChecked ->
                         taskComplete = isChecked
                     onTaskCompleteChange(task.copy(complete = isChecked))
+                        Log.d("TaskDebug", "UID: ${task.uid}, complete: $isChecked")
+
                     }
                 )
             }

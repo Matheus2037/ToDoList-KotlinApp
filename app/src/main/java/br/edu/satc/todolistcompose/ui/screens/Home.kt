@@ -124,14 +124,14 @@ fun HomeScreen(taskViewModel: TaskViewModel) {
          * O que aparece no "meio".
          * Para ficar mais organizado, montei o conteúdo em functions separadas.
          * */
-        HomeContent(innerPadding, tasks = tasks)
+        HomeContent(innerPadding, tasks = tasks, taskViewModel = taskViewModel)
         NewTask(showBottomSheet = showBottomSheet, taskViewModel = taskViewModel) { showBottomSheet = false }
 
     }
 }
 
 @Composable
-fun HomeContent(innerPadding: PaddingValues, tasks: List<TaskData>) {
+fun HomeContent(innerPadding: PaddingValues, tasks: List<TaskData>, taskViewModel: TaskViewModel) {
 
 
     /**
@@ -142,22 +142,13 @@ fun HomeContent(innerPadding: PaddingValues, tasks: List<TaskData>) {
      * TaskCard exibe o conteúdo de uma tarefa. O conteúdo pode ser passado na chamada da function
      */
 
-    Column(
+    LazyColumn(
         modifier = Modifier
             .padding(horizontal = 4.dp)
             .padding(top = innerPadding.calculateTopPadding())
-            .fillMaxSize()
-            .verticalScroll(
-                rememberScrollState()
-            ),
+            .fillMaxSize(),
         verticalArrangement = Arrangement.Top
     ) {
-        for (task in tasks) {
-            TaskCard(task.title, task.description, task.complete)
-        }
-    }
-
-    LazyColumn {
         items(tasks) { task ->
             TaskCard(
                 task = task,

@@ -12,17 +12,19 @@ class TaskViewModel(private val taskDao: TaskDao) : ViewModel() {
 
     private val _tasks = MutableStateFlow<List<TaskData>>(emptyList())
     val tasks: StateFlow<List<TaskData>> = _tasks
+    private var currentFilterByComplete = false
 
     init {
         loadTasks()
     }
 
     fun loadTasks(filterByComplete: Boolean = false) {
+        currentFilterByComplete = filterByComplete
         viewModelScope.launch {
-            if(filterByComplete == false) {
-                _tasks.value = taskDao.getAll()
-            }else{
-                _tasks.value = taskDao.findByComplete()
+            _tasks.value = if (filterByComplete) {
+                taskDao.findByComplete()
+            } else {
+                taskDao.getAll()
             }
         }
     }
@@ -30,21 +32,28 @@ class TaskViewModel(private val taskDao: TaskDao) : ViewModel() {
     fun addTask(title: String, description: String) {
         viewModelScope.launch {
             taskDao.insertAll(TaskData(0, title, description, false))
-            loadTasks(filterByComplete = false)
+            loadTasks(currentFilterByComplete)
         }
     }
 
     fun updateTask(task: TaskData) {
         viewModelScope.launch {
             taskDao.updateAll(task)
-            loadTasks(filterByComplete = false)
+            loadTasks(currentFilterByComplete)
         }
     }
 
     fun deleteTask(task: TaskData) {
         viewModelScope.launch {
             taskDao.delete(task)
-            loadTasks(filterByComplete = false)
+            loadTasks(currentFilterByComplete)
+        }
+    }
+
+    fun deleteAllTasks() {
+        viewModelScope.launch {
+            taskDao.deleteAll()
+            loadTasks(currentFilterByComplete)
         }
     }
 }
