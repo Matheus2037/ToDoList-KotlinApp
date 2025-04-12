@@ -57,6 +57,7 @@ fun HomeScreen(taskViewModel: TaskViewModel) {
     var showBottomSheet by remember { mutableStateOf(false) }
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
     val tasks by taskViewModel.tasks.collectAsState()
+    var filterByCompleteHome by remember { mutableStateOf(false) }
 
     /**
      * O componente Scaffold facilita a construção de telas seguindo as guidelines
@@ -87,7 +88,15 @@ fun HomeScreen(taskViewModel: TaskViewModel) {
                      * Este é o botão de Settings que aparece no canto direito da TopBar
                      * Podemos usar ele para acessar alguma configuração do App.
                      * * */
-                    IconButton(onClick = { taskViewModel.loadTasks(filterByComplete = true) }) {
+                    IconButton(onClick = {
+                        if (filterByCompleteHome == false){
+                            taskViewModel.loadTasks(filterByComplete = true)
+                            filterByCompleteHome = true
+                        }else{
+                            taskViewModel.loadTasks()
+                            filterByCompleteHome = false
+                        }
+                    }) {
                         Icon(
                             Icons.Rounded.Settings,
                             contentDescription = ""

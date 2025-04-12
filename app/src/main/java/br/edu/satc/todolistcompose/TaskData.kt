@@ -33,6 +33,9 @@ interface TaskDao {
     @Query("SELECT * FROM task WHERE task_complete = true")
     fun findByComplete(): List<TaskData>
 
+    @Query("SELECT * FROM task WHERE task_complete = 0")
+    fun findByIncomplete(): List<TaskData>
+
     @Update
     fun updateAll(vararg tasks: TaskData)
 

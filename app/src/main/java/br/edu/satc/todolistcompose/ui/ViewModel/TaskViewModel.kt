@@ -24,7 +24,7 @@ class TaskViewModel(private val taskDao: TaskDao) : ViewModel() {
             _tasks.value = if (filterByComplete) {
                 taskDao.findByComplete()
             } else {
-                taskDao.getAll()
+                taskDao.findByIncomplete()
             }
         }
     }
