@@ -158,7 +158,7 @@ fun HomeContent(innerPadding: PaddingValues, tasks: List<TaskData>, taskViewMode
             .fillMaxSize(),
         verticalArrangement = Arrangement.Top
     ) {
-        items(tasks) { task ->
+        items(tasks, key = { it.uid }) { task ->
             TaskCard(
                 viewModel = taskViewModel,
                 task = task,
@@ -169,6 +169,7 @@ fun HomeContent(innerPadding: PaddingValues, tasks: List<TaskData>, taskViewMode
         }
     }
 }
+
 
 /**
  * NewTask abre uma janela estilo "modal". No Android conhecida por BottomSheet.

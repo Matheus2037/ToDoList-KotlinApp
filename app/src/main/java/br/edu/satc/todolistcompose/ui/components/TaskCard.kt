@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.Settings
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ElevatedCard
@@ -17,6 +19,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -41,6 +44,7 @@ fun TaskCard(
 ) {
 
     var taskComplete by remember { mutableStateOf(task.complete) }
+    val showDeleteDialog = remember { mutableStateOf(false) }
 
     ElevatedCard(
         elevation = CardDefaults.cardElevation(
@@ -88,15 +92,59 @@ fun TaskCard(
                     text = task.description, fontSize = 12.sp
                 )
 
-                IconButton(onClick = {viewModel.deleteTask(task)}) {
+                IconButton(onClick = {showDeleteDialog.value = true}) {
                     Icon(
                         Icons.Rounded.Delete,
                         contentDescription = "Deletar Task"
                     )
                 }
             }
+            DeleteConfirmationDialog(
+                showDialog = showDeleteDialog,
+                task = task,
+                onConfirm = { taskToDelete ->
+                    viewModel.deleteTask(taskToDelete)
+                },
+                onCancel = {
 
+                },
+                viewModel = viewModel
+            )
         }
+    }
+}
+
+
+@Composable
+fun DeleteConfirmationDialog(
+    showDialog: MutableState<Boolean>,
+    task: TaskData,
+    onConfirm: (TaskData) -> Unit,
+    onCancel: () -> Unit,
+    viewModel: TaskViewModel
+){
+    if (showDialog.value) {
+        AlertDialog(
+            onDismissRequest = { showDialog.value = false },
+            title = { Text("Confirmar Exclusão") },
+            text = { Text("Deseja realmente apagar a Task?") },
+            confirmButton = {
+                Button(onClick = {
+                    onConfirm(task)
+                    showDialog.value = false
+                }) {
+                    Text("Sim")
+                }
+            },
+            dismissButton = {
+                Button(onClick = {
+                    onCancel()
+                    showDialog.value = false
+                }) {
+                    Text("Não")
+                }
+            }
+        )
     }
 }
 
