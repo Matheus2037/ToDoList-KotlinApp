@@ -32,8 +32,11 @@ class MainActivity : ComponentActivity() {
         if (taskDao.getAll().isEmpty()) {
             val task1 = TaskData(0, "Estudar Kotlin", "Revisar funções e listas", false)
             val task2 = TaskData(0, "Fazer projeto Room", "Implementar DAO e mostrar no app", false)
+            val task3 = TaskData(0, "Implementar Filtro Task concluida", "Implemtar um filtro da listagem das tasks", false)
+            val task4 = TaskData(0, "Implementar Lixeira", "Implementar botão para exclusão de task unica", false)
 
-            taskDao.insertAll(task1, task2)
+
+            taskDao.insertAll(task1, task2, task3, task4)
         }
 
 

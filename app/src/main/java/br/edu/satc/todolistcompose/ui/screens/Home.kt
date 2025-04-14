@@ -160,6 +160,7 @@ fun HomeContent(innerPadding: PaddingValues, tasks: List<TaskData>, taskViewMode
     ) {
         items(tasks) { task ->
             TaskCard(
+                viewModel = taskViewModel,
                 task = task,
                 onTaskCompleteChange = { updatedTask ->
                     taskViewModel.updateTask(updatedTask)

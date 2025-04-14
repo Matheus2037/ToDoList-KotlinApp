@@ -7,9 +7,14 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Delete
+import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -25,12 +30,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import br.edu.satc.todolistcompose.TaskData
+import br.edu.satc.todolistcompose.ui.ViewModel.TaskViewModel
 import br.edu.satc.todolistcompose.ui.theme.ToDoListComposeTheme
 
 @Composable
 fun TaskCard(
     task: TaskData,
-    onTaskCompleteChange: (TaskData) -> Unit // Nova função lambda
+    onTaskCompleteChange: (TaskData) -> Unit, // Nova função lambda
+    viewModel: TaskViewModel
 ) {
 
     var taskComplete by remember { mutableStateOf(task.complete) }
@@ -71,7 +78,24 @@ fun TaskCard(
                     }
                 )
             }
-            Text(text = task.description, fontSize = 12.sp)
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = task.description, fontSize = 12.sp
+                )
+
+                IconButton(onClick = {viewModel.deleteTask(task)}) {
+                    Icon(
+                        Icons.Rounded.Delete,
+                        contentDescription = "Deletar Task"
+                    )
+                }
+            }
+
         }
     }
 }
