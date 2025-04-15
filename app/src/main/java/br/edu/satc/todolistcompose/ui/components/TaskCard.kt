@@ -1,12 +1,15 @@
 package br.edu.satc.todolistcompose.ui.components
 
 import android.util.Log
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.Settings
@@ -26,6 +29,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -40,11 +44,12 @@ import br.edu.satc.todolistcompose.ui.theme.ToDoListComposeTheme
 fun TaskCard(
     task: TaskData,
     onTaskCompleteChange: (TaskData) -> Unit, // Nova função lambda
-    viewModel: TaskViewModel
+    viewModel: TaskViewModel,
 ) {
 
     var taskComplete by remember { mutableStateOf(task.complete) }
     val showDeleteDialog = remember { mutableStateOf(false) }
+    var showMenu by remember { mutableStateOf(false) }
 
     ElevatedCard(
         elevation = CardDefaults.cardElevation(
@@ -53,98 +58,92 @@ fun TaskCard(
             .padding(top = 8.dp)
             .fillMaxWidth()
             .height(100.dp)
-
-    ) {
-        Column(
-            modifier = Modifier
-                .padding(8.dp)
-                .fillMaxWidth()
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = task.title,
-                    style = TextStyle(
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 18.sp,
-                        fontFamily = FontFamily.Serif
-                    )
-                )
-                Checkbox(checked = taskComplete,
-                    onCheckedChange = { isChecked ->
-                        taskComplete = isChecked
-                    onTaskCompleteChange(task.copy(complete = isChecked))
-                        Log.d("TaskDebug", "UID: ${task.uid}, complete: $isChecked")
-
+            .pointerInput(Unit) {
+                detectTapGestures(
+                    onLongPress = {
+                        showMenu = true
                     }
                 )
             }
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = task.description, fontSize = 12.sp
-                )
+    ) {
+        val selectedTask = remember { mutableStateOf<TaskData?>(null) }
 
-                IconButton(onClick = {showDeleteDialog.value = true}) {
-                    Icon(
-                        Icons.Rounded.Delete,
-                        contentDescription = "Deletar Task"
+        Box {
+            Column(
+                modifier = Modifier
+                    .padding(8.dp)
+                    .fillMaxWidth()
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = task.title,
+                        style = TextStyle(
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 18.sp,
+                            fontFamily = FontFamily.Serif
+                        )
+                    )
+                    Checkbox(checked = taskComplete,
+                        onCheckedChange = { isChecked ->
+                            taskComplete = isChecked
+                            onTaskCompleteChange(task.copy(complete = isChecked))
+                            Log.d("TaskDebug", "UID: ${task.uid}, complete: $isChecked")
+                        }
+                    )
+                }
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = task.description, fontSize = 12.sp
+                    )
+
+                    IconButton(onClick = { showDeleteDialog.value = true }) {
+                        Icon(
+                            Icons.Rounded.Delete,
+                            contentDescription = "Deletar Task"
+                        )
+                    }
+                }
+                DeleteConfirmationDialog(
+                    showDialog = showDeleteDialog,
+                    task = task,
+                    onConfirm = { taskToDelete ->
+                        viewModel.deleteTask(taskToDelete)
+                    },
+                    onCancel = {
+
+                    },
+                    viewModel = viewModel
+                )
+            }
+            if (showMenu) {
+                Box(modifier = Modifier.wrapContentSize(Alignment.TopStart),) {
+                    TaskOnLongPressMenu(
+                        onDismiss = { showMenu = false },
+                        task = task,
+                        onCompleteClick = {
+                            val newComplete = !task.complete
+                            taskComplete = newComplete
+                            onTaskCompleteChange(task.copy(complete = newComplete))
+                            showMenu = false
+                        },
+                        onDeleteClick = {
+                            showDeleteDialog.value = true
+                            showMenu = false
+                        }
                     )
                 }
             }
-            DeleteConfirmationDialog(
-                showDialog = showDeleteDialog,
-                task = task,
-                onConfirm = { taskToDelete ->
-                    viewModel.deleteTask(taskToDelete)
-                },
-                onCancel = {
-
-                },
-                viewModel = viewModel
-            )
         }
-    }
-}
-
-
-@Composable
-fun DeleteConfirmationDialog(
-    showDialog: MutableState<Boolean>,
-    task: TaskData,
-    onConfirm: (TaskData) -> Unit,
-    onCancel: () -> Unit,
-    viewModel: TaskViewModel
-){
-    if (showDialog.value) {
-        AlertDialog(
-            onDismissRequest = { showDialog.value = false },
-            title = { Text("Confirmar Exclusão") },
-            text = { Text("Deseja realmente apagar a Task?") },
-            confirmButton = {
-                Button(onClick = {
-                    onConfirm(task)
-                    showDialog.value = false
-                }) {
-                    Text("Sim")
-                }
-            },
-            dismissButton = {
-                Button(onClick = {
-                    onCancel()
-                    showDialog.value = false
-                }) {
-                    Text("Não")
-                }
-            }
-        )
     }
 }
 

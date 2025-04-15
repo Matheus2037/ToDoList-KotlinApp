@@ -34,11 +34,12 @@ class MainActivity : ComponentActivity() {
             val task2 = TaskData(0, "Fazer projeto Room", "Implementar DAO e mostrar no app", false)
             val task3 = TaskData(0, "Implementar Filtro Task concluida", "Implemtar um filtro da listagem das tasks", false)
             val task4 = TaskData(0, "Implementar Lixeira", "Implementar botão para exclusão de task unica", false)
+            val task5 = TaskData(0, "Task Coringa 1", "Registro para testar exclusão", false)
+            val task6 = TaskData(0, "Task Coringa 2", "Registro para testar exclusão", false)
+            val task7 = TaskData(0, "Task Coringa 3", "Registro para testar exclusão", false)
 
-
-            taskDao.insertAll(task1, task2, task3, task4)
+            taskDao.insertAll(task1, task2, task3, task4, task5, task6, task7)
         }
-
 
 
         setContent {

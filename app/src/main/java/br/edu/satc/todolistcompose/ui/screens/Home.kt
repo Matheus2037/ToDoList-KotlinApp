@@ -3,11 +3,13 @@
 package br.edu.satc.todolistcompose.ui.screens
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -44,7 +46,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import br.edu.satc.todolistcompose.TaskData
 import br.edu.satc.todolistcompose.ui.ViewModel.TaskViewModel
+import br.edu.satc.todolistcompose.ui.components.SettingsButtonWithMenu
 import br.edu.satc.todolistcompose.ui.components.TaskCard
+import br.edu.satc.todolistcompose.ui.components.TaskOnLongPressMenu
 import kotlinx.coroutines.launch
 
 
@@ -87,21 +91,17 @@ fun HomeScreen(taskViewModel: TaskViewModel) {
                     /**
                      * Este é o botão de Settings que aparece no canto direito da TopBar
                      * Podemos usar ele para acessar alguma configuração do App.
-                     * * */
-                    IconButton(onClick = {
-                        if (filterByCompleteHome == false){
-                            taskViewModel.loadTasks(filterByComplete = true)
-                            filterByCompleteHome = true
-                        }else{
-                            taskViewModel.loadTasks()
-                            filterByCompleteHome = false
-                        }
-                    }) {
-                        Icon(
-                            Icons.Rounded.Settings,
-                            contentDescription = ""
-                        )
-                    }
+                     * */
+                    SettingsButtonWithMenu(
+                        onFilterChange = { filterComplete ->
+                            taskViewModel.loadTasks(filterByComplete = filterComplete)
+                            filterByCompleteHome = filterComplete
+                        },
+                        onDarkModeToggle = { darkModeEnabled ->
+                            println("Dark Mode Toggled: $darkModeEnabled")
+                        },
+                        filterByCompleteHome = filterByCompleteHome
+                    )
                 },
                 /**
                  * Aplicamos um comportamento para o scroll da TopBar
@@ -142,7 +142,6 @@ fun HomeScreen(taskViewModel: TaskViewModel) {
 @Composable
 fun HomeContent(innerPadding: PaddingValues, tasks: List<TaskData>, taskViewModel: TaskViewModel) {
 
-
     /**
      * Aqui simplesmente temos uma Column com o nosso conteúdo.
      * A chamada verticalScroll(rememberScrollState()), passada para o Modifier,
@@ -151,24 +150,26 @@ fun HomeContent(innerPadding: PaddingValues, tasks: List<TaskData>, taskViewMode
      * TaskCard exibe o conteúdo de uma tarefa. O conteúdo pode ser passado na chamada da function
      */
 
+
     LazyColumn(
         modifier = Modifier
             .padding(horizontal = 4.dp)
             .padding(top = innerPadding.calculateTopPadding())
             .fillMaxSize(),
         verticalArrangement = Arrangement.Top
-    ) {
-        items(tasks, key = { it.uid }) { task ->
-            TaskCard(
-                viewModel = taskViewModel,
-                task = task,
-                onTaskCompleteChange = { updatedTask ->
-                    taskViewModel.updateTask(updatedTask)
-                }
-            )
+    )
+        {
+            items(tasks, key = { it.uid }) { task ->
+                TaskCard(
+                    viewModel = taskViewModel,
+                    task = task,
+                    onTaskCompleteChange = { updatedTask ->
+                        taskViewModel.updateTask(updatedTask)
+                    }
+                )
+            }
         }
     }
-}
 
 
 /**
