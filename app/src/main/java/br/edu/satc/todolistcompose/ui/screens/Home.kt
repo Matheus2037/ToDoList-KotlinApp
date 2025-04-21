@@ -3,25 +3,19 @@
 package br.edu.satc.todolistcompose.ui.screens
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
@@ -42,13 +36,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import br.edu.satc.todolistcompose.TaskData
 import br.edu.satc.todolistcompose.ui.ViewModel.TaskViewModel
+import br.edu.satc.todolistcompose.ui.components.InvalidAlertDialog
 import br.edu.satc.todolistcompose.ui.components.SettingsButtonWithMenu
 import br.edu.satc.todolistcompose.ui.components.TaskCard
-import br.edu.satc.todolistcompose.ui.components.TaskOnLongPressMenu
 import kotlinx.coroutines.launch
 
 
@@ -187,6 +180,8 @@ fun NewTask(showBottomSheet: Boolean, taskViewModel: TaskViewModel, onComplete: 
         mutableStateOf("")
     }
 
+    val showInvalidDialog = remember { mutableStateOf(false) }
+
     if (showBottomSheet) {
         ModalBottomSheet(
             onDismissRequest = {
@@ -205,26 +200,35 @@ fun NewTask(showBottomSheet: Boolean, taskViewModel: TaskViewModel, onComplete: 
 
                 OutlinedTextField(
                     value = taskTitle,
-                    onValueChange = {taskTitle = it},
+                    onValueChange = { taskTitle = it },
                     label = { Text(text = "Título da tarefa") })
                 OutlinedTextField(
                     value = taskDescription,
-                    onValueChange = {taskDescription = it},
+                    onValueChange = { taskDescription = it },
                     label = { Text(text = "Descrição da tarefa") })
                 Button(modifier = Modifier.padding(top = 4.dp), onClick = {
-                    taskViewModel.addTask(taskTitle, taskDescription)
-                    taskTitle = ""
-                    taskDescription = ""
-                    scope.launch { sheetState.hide() }.invokeOnCompletion {
-                        if (!sheetState.isVisible) {
-                            onComplete()
+                    if (taskTitle.isNotBlank() && taskDescription.isNotBlank()) {
+                        taskViewModel.addTask(taskTitle, taskDescription)
+                        taskTitle = ""
+                        taskDescription = ""
+                        scope.launch { sheetState.hide() }.invokeOnCompletion {
+                            if (!sheetState.isVisible) {
+                                onComplete()
+                            }
                         }
-                    }
+                    } else
+                        showInvalidDialog.value = true
                 }) {
                     Text("Salvar")
                 }
             }
         }
+    }
+
+    if (showInvalidDialog.value) {
+        InvalidAlertDialog(
+            showDialog = showInvalidDialog,
+        )
     }
 }
 
